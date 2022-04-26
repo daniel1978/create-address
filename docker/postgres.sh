@@ -1,3 +1,5 @@
+#!/bin/bash
+
 docker run -d \
   --name create-address-postgres \
   -e POSTGRES_DB=crm \

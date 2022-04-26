@@ -8,13 +8,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
 @SpringBootApplication
 @ComponentScan(basePackages = "ch.gisel.bpmn.create_address")
 @EntityScan(basePackages = "ch.gisel.bpmn.create_address.entity")
 @EnableJpaRepositories(basePackages = "ch.gisel.bpmn.create_address.repository")
+@ImportResource("classpath:beans.xml")
 public class SpringBootCreateAddressApplication {
 
     public static void main(String[] args) {

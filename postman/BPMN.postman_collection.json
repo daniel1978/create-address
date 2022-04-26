@@ -1,0 +1,321 @@
+{
+	"info": {
+		"_postman_id": "8a0a5671-4901-4883-8b7f-3e7768140cbd",
+		"name": "BPMN",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Camunda",
+			"item": [
+				{
+					"name": "Process Definition",
+					"item": [
+						{
+							"name": "Get Definitions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/engine-rest/process-definition",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"engine-rest",
+										"process-definition"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get BPMN 2.0 XML",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/engine-rest/process-definition/invoice:2:aec2cc05-c48c-11ec-bf88-0242ac110002/xml",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"engine-rest",
+										"process-definition",
+										"invoice:2:aec2cc05-c48c-11ec-bf88-0242ac110002",
+										"xml"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Definition",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/engine-rest/process-definition/Process_1h1nu0s:1:6c46c0e9-c495-11ec-bf88-0242ac110002",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"engine-rest",
+										"process-definition",
+										"Process_1h1nu0s:1:6c46c0e9-c495-11ec-bf88-0242ac110002"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Start Process Instance",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/engine-rest/process-definition/key/CreateAddress/start",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"engine-rest",
+										"process-definition",
+										"key",
+										"CreateAddress",
+										"start"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Process Instances",
+					"item": [
+						{
+							"name": "Get Instances",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/engine-rest/process-instance?processDefinitionKey=CreateAddress",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"engine-rest",
+										"process-instance"
+									],
+									"query": [
+										{
+											"key": "processDefinitionKey",
+											"value": "CreateAddress"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Task",
+					"item": [
+						{
+							"name": "Get Tasks For Process Instance",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/engine-rest/task?processInstanceId=aa8cce6e-c4d7-11ec-a4b4-0242ac110002",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"engine-rest",
+										"task"
+									],
+									"query": [
+										{
+											"key": "processInstanceId",
+											"value": "aa8cce6e-c4d7-11ec-a4b4-0242ac110002"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Complete Task",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"variables\" : {\n        \"addressValidated\" : {\n            \"value\" : false,\n            \"type\" : \"Boolean\"\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/engine-rest/task/ecbe2643-c4d7-11ec-a4b4-0242ac110002/complete",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"engine-rest",
+										"task",
+										"ecbe2643-c4d7-11ec-a4b4-0242ac110002",
+										"complete"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Create Address",
+			"item": [
+				{
+					"name": "Address",
+					"item": [
+						{
+							"name": "Get Address",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8090/services/address/2",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8090",
+									"path": [
+										"services",
+										"address",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Save Address",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": null,\n    \"name\": \"Angela\",\n    \"street\": \"Anderestrasse\",\n    \"addressType\": \"CUSTOMER\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8090/services/address",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8090",
+									"path": [
+										"services",
+										"address"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Activity",
+					"item": [
+						{
+							"name": "Create Activity",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8090/services/activity/create?activityType=CreateAddress",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8090",
+									"path": [
+										"services",
+										"activity",
+										"create"
+									],
+									"query": [
+										{
+											"key": "activityType",
+											"value": "CreateAddress"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Work Activity",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8090/services/activity/1/work",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8090",
+									"path": [
+										"services",
+										"activity",
+										"1",
+										"work"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

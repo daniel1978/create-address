@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxrs-client="http://cxf.apache.org/jaxrs-client"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd">
+
+    <jaxrs-client:client id="processDefinitionServiceClient"
+                         address="http://localhost:8080/engine-rest/"
+                         serviceClass="ch.gisel.bpmn.create_address.camunda.service.ProcessDefinitionService">
+        <jaxrs-client:providers>
+            <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+        </jaxrs-client:providers>
+    </jaxrs-client:client>
+
+    <jaxrs-client:client id="taskServiceClient"
+                         address="http://localhost:8080/engine-rest/"
+                         serviceClass="ch.gisel.bpmn.create_address.camunda.service.TaskService">
+        <jaxrs-client:providers>
+            <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+        </jaxrs-client:providers>
+    </jaxrs-client:client>
+</beans>
