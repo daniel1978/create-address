@@ -13,4 +13,7 @@ public interface AddressService {
     @GET
     @Path("{id}")
     AddressDTO loadAddress(@PathParam("id") Long id);
+
+    @POST
+    AddressDTO saveAddress(AddressDTO address);
 }
