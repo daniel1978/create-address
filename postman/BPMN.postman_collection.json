@@ -81,7 +81,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n}",
+									"raw": "{\n    \"variables\": {\n        \"addressId\" : {\n            \"value\" : 0,\n            \"type\": \"long\"\n        }\n    }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -148,7 +148,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/engine-rest/task?processInstanceId=aa8cce6e-c4d7-11ec-a4b4-0242ac110002",
+									"raw": "http://localhost:8080/engine-rest/task?processInstanceId=fba231d0-c5a1-11ec-a4b4-0242ac110002",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -161,7 +161,7 @@
 									"query": [
 										{
 											"key": "processInstanceId",
-											"value": "aa8cce6e-c4d7-11ec-a4b4-0242ac110002"
+											"value": "fba231d0-c5a1-11ec-a4b4-0242ac110002"
 										}
 									]
 								}
@@ -269,6 +269,15 @@
 							"request": {
 								"method": "PUT",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"activityProperties\": [\n        {\n            \"name\": \"addressId\",\n            \"value\": \"0\",\n            \"type\": \"long\"\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
 									"raw": "http://localhost:8090/services/activity/create?activityType=CreateAddress",
 									"protocol": "http",
@@ -297,7 +306,7 @@
 								"method": "PUT",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8090/services/activity/1/work",
+									"raw": "http://localhost:8090/services/activity/12/work",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -306,7 +315,7 @@
 									"path": [
 										"services",
 										"activity",
-										"1",
+										"12",
 										"work"
 									]
 								}
