@@ -65,7 +65,7 @@
               </camunda:map>
             </camunda:inputParameter>
             <camunda:inputParameter name="method">GET</camunda:inputParameter>
-            <camunda:inputParameter name="url">http://host.docker.internal:8090/services/address/2</camunda:inputParameter>
+            <camunda:inputParameter name="url">http://host.docker.internal:8090/services/address/${addressId}</camunda:inputParameter>
             <camunda:outputParameter name="response">${response}</camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>

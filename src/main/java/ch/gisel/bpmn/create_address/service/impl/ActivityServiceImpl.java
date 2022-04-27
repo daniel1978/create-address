@@ -1,13 +1,20 @@
 package ch.gisel.bpmn.create_address.service.impl;
 
+import ch.gisel.bpmn.create_address.camunda.dto.StartInstanceInDTO;
 import ch.gisel.bpmn.create_address.camunda.dto.StartInstanceOutDTO;
 import ch.gisel.bpmn.create_address.camunda.dto.TaskOutDTO;
+import ch.gisel.bpmn.create_address.camunda.dto.VariableDTO;
 import ch.gisel.bpmn.create_address.camunda.service.ProcessDefinitionService;
 import ch.gisel.bpmn.create_address.camunda.service.TaskService;
 import ch.gisel.bpmn.create_address.dto.ActivityDTO;
+import ch.gisel.bpmn.create_address.dto.ActivityInDTO;
+import ch.gisel.bpmn.create_address.dto.ActivityPropertyDTO;
 import ch.gisel.bpmn.create_address.dto.ActivityWorkContextDTO;
 import ch.gisel.bpmn.create_address.entity.Activity;
+import ch.gisel.bpmn.create_address.entity.ActivityProperty;
 import ch.gisel.bpmn.create_address.mapper.ActivityMapper;
+import ch.gisel.bpmn.create_address.mapper.ActivityPropertyMapper;
+import ch.gisel.bpmn.create_address.repository.ActivityPropertyRepository;
 import ch.gisel.bpmn.create_address.repository.ActivityRepository;
 import ch.gisel.bpmn.create_address.service.ActivityService;
 import ch.gisel.bpmn.create_address.type.ActivityStatus;
@@ -15,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -26,6 +34,12 @@ public class ActivityServiceImpl implements ActivityService {
     @Inject
     private ActivityMapper activityMapper;
 
+    @Inject
+    private ActivityPropertyRepository activityPropertyRepository;
+
+    @Inject
+    private ActivityPropertyMapper activityPropertyMapper;
+
     @Resource(name = "processDefinitionServiceClient")
     private ProcessDefinitionService processDefinitionService;
 
@@ -33,10 +47,21 @@ public class ActivityServiceImpl implements ActivityService {
     private TaskService taskService;
 
     @Override
-    public ActivityDTO createActivity(String activityType) {
+    public ActivityDTO createActivity(String activityType, ActivityInDTO inDTO) {
         Activity activity = new Activity();
         activity.setActivityType(activityType);
         activity = activityRepository.save(activity);
+
+        if (inDTO != null) {
+            if (inDTO.getActivityProperties() != null) {
+                for (ActivityPropertyDTO activityPropertyDTO : inDTO.getActivityProperties()) {
+                    ActivityProperty activityProperty = activityPropertyMapper.dtoToEntity(activityPropertyDTO);
+                    activityProperty.setActivity(activity);
+                    activityPropertyRepository.save(activityProperty);
+                }
+            }
+        }
+
         return activityMapper.entityToDTO(activity);
     }
 
@@ -44,7 +69,17 @@ public class ActivityServiceImpl implements ActivityService {
     public ActivityWorkContextDTO workActivity(long activityId) {
         Activity activity = activityRepository.findById(activityId).get();
         if (activity.getProcessReference() == null) {
-            StartInstanceOutDTO startInstanceOutDTO = processDefinitionService.startInstance(activity.getActivityType());
+            List<ActivityProperty> propertyList = activityPropertyRepository.findByActivity(activity);
+            StartInstanceInDTO inDTO = null;
+            if (propertyList != null && propertyList.size() > 0) {
+                inDTO = new StartInstanceInDTO();
+                inDTO.setVariables(new HashMap<>());
+                for (ActivityProperty property : propertyList) {
+                    inDTO.getVariables().put(property.getName(), createVariableDTO(property.getValue(), property.getType()));
+                }
+            }
+
+            StartInstanceOutDTO startInstanceOutDTO = processDefinitionService.startInstance(activity.getActivityType(), inDTO);
             activity.setProcessReference(startInstanceOutDTO.getId());
             activity.setStatus(ActivityStatus.RUNNING);
             activity = activityRepository.save(activity);
@@ -60,6 +95,21 @@ public class ActivityServiceImpl implements ActivityService {
             return activityWorkContextDTO;
         }
         return null;
+    }
+
+    private VariableDTO createVariableDTO(String value, String type) {
+        Object valueObject;
+        switch (type) {
+            case "long":
+                valueObject = Long.valueOf(value);
+                break;
+            case "Boolean":
+                valueObject = Boolean.valueOf(value);
+                break;
+            default:
+                valueObject = value;
+        }
+        return new VariableDTO(valueObject, type);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package ch.gisel.bpmn.create_address.service;
 
 import ch.gisel.bpmn.create_address.dto.ActivityDTO;
+import ch.gisel.bpmn.create_address.dto.ActivityInDTO;
 import ch.gisel.bpmn.create_address.dto.ActivityWorkContextDTO;
 
 import javax.ws.rs.*;
@@ -13,7 +14,7 @@ public interface ActivityService {
 
     @PUT
     @Path("create")
-    ActivityDTO createActivity(@QueryParam("activityType") String activityType);
+    ActivityDTO createActivity(@QueryParam("activityType") String activityType, ActivityInDTO inDTO);
 
     @PUT
     @Path("{id}/work")
