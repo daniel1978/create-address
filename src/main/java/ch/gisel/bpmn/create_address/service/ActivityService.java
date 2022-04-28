@@ -2,7 +2,8 @@ package ch.gisel.bpmn.create_address.service;
 
 import ch.gisel.bpmn.create_address.dto.ActivityDTO;
 import ch.gisel.bpmn.create_address.dto.ActivityInDTO;
-import ch.gisel.bpmn.create_address.dto.ActivityWorkContextDTO;
+import ch.gisel.bpmn.create_address.dto.ActivityWorkContextInDTO;
+import ch.gisel.bpmn.create_address.dto.ActivityWorkContextOutDTO;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -18,13 +19,13 @@ public interface ActivityService {
 
     @PUT
     @Path("{id}/work")
-    ActivityWorkContextDTO workActivity(@PathParam("id") long activityId);
+    ActivityWorkContextOutDTO workActivity(@PathParam("id") long activityId);
 
     @PUT
     @Path("{id}/task-finish")
-    ActivityWorkContextDTO finishActivityTask(@PathParam("id") long activityId, ActivityWorkContextDTO inDTO);
+    ActivityWorkContextOutDTO finishActivityTask(@PathParam("id") long activityId, ActivityWorkContextInDTO inDTO);
 
     @PUT
     @Path("{id}/task-save")
-    ActivityWorkContextDTO saveActivityTask(@PathParam("id") long activityId, ActivityWorkContextDTO inDTO);
+    ActivityWorkContextOutDTO saveActivityTask(@PathParam("id") long activityId, ActivityWorkContextInDTO inDTO);
 }

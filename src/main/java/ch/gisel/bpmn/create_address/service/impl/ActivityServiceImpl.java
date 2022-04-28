@@ -1,9 +1,6 @@
 package ch.gisel.bpmn.create_address.service.impl;
 
-import ch.gisel.bpmn.create_address.camunda.dto.StartInstanceInDTO;
-import ch.gisel.bpmn.create_address.camunda.dto.StartInstanceOutDTO;
-import ch.gisel.bpmn.create_address.camunda.dto.TaskOutDTO;
-import ch.gisel.bpmn.create_address.camunda.dto.VariableDTO;
+import ch.gisel.bpmn.create_address.camunda.dto.*;
 import ch.gisel.bpmn.create_address.camunda.service.ProcessDefinitionService;
 import ch.gisel.bpmn.create_address.camunda.service.TaskService;
 import ch.gisel.bpmn.create_address.dto.*;
@@ -41,9 +38,11 @@ public class ActivityServiceImpl implements ActivityService {
     @Inject
     private ActivityPropertyMapper activityPropertyMapper;
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Resource(name = "processDefinitionServiceClient")
     private ProcessDefinitionService processDefinitionService;
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Resource(name = "taskServiceClient")
     private TaskService taskService;
 
@@ -67,7 +66,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public ActivityWorkContextDTO workActivity(long activityId) {
+    public ActivityWorkContextOutDTO workActivity(long activityId) {
         Activity activity = activityRepository.findById(activityId).get();
         if (activity.getProcessReference() == null) {
             List<ActivityProperty> propertyList = activityPropertyRepository.findByActivity(activity);
@@ -88,24 +87,21 @@ public class ActivityServiceImpl implements ActivityService {
 
         List<TaskOutDTO> taskList = taskService.getTasksForProcessInstance(activity.getProcessReference());
 
-        if (taskList != null && taskList.size() > 0) {
-            TaskOutDTO firstTask = taskList.get(0);
-            ActivityWorkContextDTO activityWorkContextDTO = new ActivityWorkContextDTO();
-            activityWorkContextDTO.setTaskId(firstTask.getId());
-            activityWorkContextDTO.setProcessInstanceId(activity.getProcessReference());
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            TaskDefinitionDTO taskDefinitionDTO;
-            try {
-                taskDefinitionDTO = objectMapper.readValue(firstTask.getDescription(), TaskDefinitionDTO.class);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            activityWorkContextDTO.setScreenId(taskDefinitionDTO.getScreenId());
-            activityWorkContextDTO.setOutObjects(createOutObjects(firstTask.getId(), taskDefinitionDTO));
-            return activityWorkContextDTO;
+        if (taskList == null || taskList.size() == 0) {
+            return null;
         }
-        return null;
+        TaskOutDTO firstTask = taskList.get(0);
+        ActivityWorkContextOutDTO activityWorkContextDTO = new ActivityWorkContextOutDTO();
+        activityWorkContextDTO.setActivityId(activityId);
+        activityWorkContextDTO.setTaskId(firstTask.getId());
+        activityWorkContextDTO.setProcessInstanceId(activity.getProcessReference());
+
+        TaskDefinitionDTO taskDefinitionDTO = getTaskDefinition(firstTask);
+
+        activityWorkContextDTO.setScreenId(taskDefinitionDTO.getScreenId());
+        activityWorkContextDTO.setOutObjects(createOutObjects(firstTask.getId(), taskDefinitionDTO));
+        activityWorkContextDTO.setInObjects(createInObjects(taskDefinitionDTO));
+        return activityWorkContextDTO;
     }
 
     private VariableDTO createVariableDTO(String value, String type) {
@@ -123,38 +119,117 @@ public class ActivityServiceImpl implements ActivityService {
         return new VariableDTO(valueObject, type);
     }
 
-    private Map<String, Object> createOutObjects(String taskId, TaskDefinitionDTO taskDefinitionDTO) {
+    private TaskDefinitionDTO getTaskDefinition(TaskOutDTO task) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.readValue(task.getDescription(), TaskDefinitionDTO.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Map<String, ActivityVariableDTO> createOutObjects(String taskId, TaskDefinitionDTO taskDefinitionDTO) {
         if (taskDefinitionDTO.getOutVariables() == null || taskDefinitionDTO.getOutVariables().size() == 0) {
             return null;
         }
         String outVariableNames = taskDefinitionDTO.getOutVariables().stream().map(td -> td.getName()).collect(Collectors.joining(","));
         Map<String, VariableDTO> formVariables = taskService.getFormVariables(taskId, outVariableNames);
-        Map<String, Object> outObjectMap = new HashMap<>();
+        Map<String, ActivityVariableDTO> outObjectMap = new HashMap<>();
         ObjectMapper objectMapper = new ObjectMapper();
         for (TaskDefinitionVariableDTO taskDefinitionVariable : taskDefinitionDTO.getOutVariables()) {
             VariableDTO variableDTO = formVariables.get(taskDefinitionVariable.getName());
             if (variableDTO != null) {
                 try {
                     Object object = objectMapper.readValue(variableDTO.getValue().toString(), Class.forName(taskDefinitionVariable.getType()));
-                    outObjectMap.put(taskDefinitionVariable.getName(), object);
+                    outObjectMap.put(taskDefinitionVariable.getName(), new ActivityVariableDTO(object, taskDefinitionVariable.getType()));
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException("Cannot read task variable " + taskDefinitionVariable.getName() + "(" + variableDTO.getType() + "): " + variableDTO.getValue(), e);
                 }
             } else {
-                outObjectMap.put(taskDefinitionVariable.getName(), null);
+                outObjectMap.put(taskDefinitionVariable.getName(), new ActivityVariableDTO(null, taskDefinitionVariable.getType()));
             }
         }
         return outObjectMap;
     }
 
-    @Override
-    public ActivityWorkContextDTO finishActivityTask(long activityId, ActivityWorkContextDTO inDTO) {
-        //TODO implement
-        return null;
+    private Map<String, ActivityVariableDTO> createInObjects(TaskDefinitionDTO taskDefinitionDTO) {
+        if (taskDefinitionDTO.getInVariables() == null || taskDefinitionDTO.getInVariables().size() == 0) {
+            return null;
+        }
+        Map<String, ActivityVariableDTO> inObjectMap = new HashMap<>();
+        for (TaskDefinitionVariableDTO taskDefinitionVariable : taskDefinitionDTO.getInVariables()) {
+            inObjectMap.put(taskDefinitionVariable.getName(), new ActivityVariableDTO(null, taskDefinitionVariable.getType()));
+        }
+        return inObjectMap;
     }
 
     @Override
-    public ActivityWorkContextDTO saveActivityTask(long activityId, ActivityWorkContextDTO inDTO) {
+    public ActivityWorkContextOutDTO finishActivityTask(long activityId, ActivityWorkContextInDTO inDTO) {
+        Activity activity = activityRepository.findById(activityId).get();
+        if (activity.getProcessReference() == null) {
+            throw new RuntimeException("Activity has no process reference: " + activity);
+        }
+        List<TaskOutDTO> taskList = taskService.getTasksForProcessInstance(activity.getProcessReference());
+
+        if (taskList == null || taskList.size() == 0) {
+            return null;
+        }
+        TaskOutDTO firstTask = taskList.get(0);
+        if (!firstTask.getId().equals(inDTO.getTaskId())) {
+            throw new RuntimeException("Given task is not the active task of activity");
+        }
+
+        TaskDefinitionDTO taskDefinitionDTO = getTaskDefinition(firstTask);
+        Map<String, ActivityVariableDTO> expectedInObjects = createInObjects(taskDefinitionDTO);
+        validateInObjects(expectedInObjects, inDTO.getInObjects());
+
+        SubmitFormInDTO submitFormInDTO = createSubmitFormInDTO(inDTO.getInObjects());
+        //TODO service call does not work yet
+        taskService.submitForm(inDTO.getTaskId(), submitFormInDTO);
+
+        return workActivity(activityId);
+    }
+
+    private void validateInObjects(Map<String, ActivityVariableDTO> expectedInObjects, Map<String, ActivityVariableDTO> inObjects) {
+        if ((expectedInObjects == null || expectedInObjects.size() == 0) && (inObjects == null || inObjects.size() == 0)) {
+            return;
+        }
+        if (expectedInObjects.size() != inObjects.size()) {
+            throw new RuntimeException("Size of inObjects is not the exptected size of inObjects");
+        }
+        if (!inObjects.keySet().containsAll(expectedInObjects.keySet())) {
+            throw new RuntimeException("Not all expected variables are present");
+        }
+        for (String key : expectedInObjects.keySet()) {
+            if (!expectedInObjects.get(key).getType().equals(inObjects.get(key).getType())) {
+                throw new RuntimeException("Wrong type provided for property " + key + " Expected: " + expectedInObjects.get(key).getType() + " Provided: " + inObjects.get(key).getType());
+            }
+        }
+    }
+
+    private SubmitFormInDTO createSubmitFormInDTO(Map<String, ActivityVariableDTO> inObjects) {
+        if (inObjects == null || inObjects.size() == 0) {
+            return null;
+        }
+        Map<String, VariableDTO> variableMap = new HashMap<>();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        for (Map.Entry<String, ActivityVariableDTO> entry : inObjects.entrySet()) {
+            try {
+                String jsonValue = objectMapper.writeValueAsString(entry.getValue().getValue());
+                Object object = objectMapper.readValue(jsonValue, Class.forName(entry.getValue().getType()));
+                variableMap.put(entry.getKey(), new VariableDTO(object, entry.getValue().getType()));
+            } catch (ClassNotFoundException | IOException e) {
+                throw new RuntimeException("Cannot read variable: " + entry.getKey(), e);
+            }
+        }
+        SubmitFormInDTO inDTO = new SubmitFormInDTO();
+        inDTO.setVariables(variableMap);
+        return inDTO;
+    }
+
+    @Override
+    public ActivityWorkContextOutDTO saveActivityTask(long activityId, ActivityWorkContextInDTO inDTO) {
         //TODO implement
         return null;
     }

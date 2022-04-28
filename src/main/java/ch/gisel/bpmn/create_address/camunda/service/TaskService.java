@@ -1,5 +1,6 @@
 package ch.gisel.bpmn.create_address.camunda.service;
 
+import ch.gisel.bpmn.create_address.camunda.dto.SubmitFormInDTO;
 import ch.gisel.bpmn.create_address.camunda.dto.TaskOutDTO;
 import ch.gisel.bpmn.create_address.camunda.dto.VariableDTO;
 
@@ -20,4 +21,8 @@ public interface TaskService {
     @GET
     @Path("{id}/form-variables")
     Map<String, VariableDTO> getFormVariables(@PathParam("id") String taskId, @QueryParam("variableNames") String variableNames);
+
+    @POST
+    @Path("{id}/submit-form")
+    void submitForm(@PathParam("id") String taskId, SubmitFormInDTO inDTO);
 }
