@@ -27,6 +27,10 @@ public class ValidationResultDTO {
         return status;
     }
 
+    public void setValidationStatus(ValidationStatus status) {
+        // used for JSON deserialization, don't do anything
+    }
+
     public void addValidationMessage(String field, String validationMessage, ValidationStatus status) {
         validationMessages.add(new ValidationMessageDTO(field, validationMessage, status));
     }

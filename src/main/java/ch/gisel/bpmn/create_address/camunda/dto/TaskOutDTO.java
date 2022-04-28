@@ -9,4 +9,5 @@ public class TaskOutDTO {
 
     private String id;
     private String name;
+    private String description;
 }

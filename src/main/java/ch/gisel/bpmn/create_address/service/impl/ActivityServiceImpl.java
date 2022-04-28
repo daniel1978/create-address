@@ -6,10 +6,7 @@ import ch.gisel.bpmn.create_address.camunda.dto.TaskOutDTO;
 import ch.gisel.bpmn.create_address.camunda.dto.VariableDTO;
 import ch.gisel.bpmn.create_address.camunda.service.ProcessDefinitionService;
 import ch.gisel.bpmn.create_address.camunda.service.TaskService;
-import ch.gisel.bpmn.create_address.dto.ActivityDTO;
-import ch.gisel.bpmn.create_address.dto.ActivityInDTO;
-import ch.gisel.bpmn.create_address.dto.ActivityPropertyDTO;
-import ch.gisel.bpmn.create_address.dto.ActivityWorkContextDTO;
+import ch.gisel.bpmn.create_address.dto.*;
 import ch.gisel.bpmn.create_address.entity.Activity;
 import ch.gisel.bpmn.create_address.entity.ActivityProperty;
 import ch.gisel.bpmn.create_address.mapper.ActivityMapper;
@@ -18,12 +15,16 @@ import ch.gisel.bpmn.create_address.repository.ActivityPropertyRepository;
 import ch.gisel.bpmn.create_address.repository.ActivityRepository;
 import ch.gisel.bpmn.create_address.service.ActivityService;
 import ch.gisel.bpmn.create_address.type.ActivityStatus;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ActivityServiceImpl implements ActivityService {
@@ -91,7 +92,17 @@ public class ActivityServiceImpl implements ActivityService {
             TaskOutDTO firstTask = taskList.get(0);
             ActivityWorkContextDTO activityWorkContextDTO = new ActivityWorkContextDTO();
             activityWorkContextDTO.setTaskId(firstTask.getId());
-            activityWorkContextDTO.setTaskName(firstTask.getName());
+            activityWorkContextDTO.setProcessInstanceId(activity.getProcessReference());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            TaskDefinitionDTO taskDefinitionDTO;
+            try {
+                taskDefinitionDTO = objectMapper.readValue(firstTask.getDescription(), TaskDefinitionDTO.class);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            activityWorkContextDTO.setScreenId(taskDefinitionDTO.getScreenId());
+            activityWorkContextDTO.setOutObjects(createOutObjects(firstTask.getId(), taskDefinitionDTO));
             return activityWorkContextDTO;
         }
         return null;
@@ -110,6 +121,30 @@ public class ActivityServiceImpl implements ActivityService {
                 valueObject = value;
         }
         return new VariableDTO(valueObject, type);
+    }
+
+    private Map<String, Object> createOutObjects(String taskId, TaskDefinitionDTO taskDefinitionDTO) {
+        if (taskDefinitionDTO.getOutVariables() == null || taskDefinitionDTO.getOutVariables().size() == 0) {
+            return null;
+        }
+        String outVariableNames = taskDefinitionDTO.getOutVariables().stream().map(td -> td.getName()).collect(Collectors.joining(","));
+        Map<String, VariableDTO> formVariables = taskService.getFormVariables(taskId, outVariableNames);
+        Map<String, Object> outObjectMap = new HashMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        for (TaskDefinitionVariableDTO taskDefinitionVariable : taskDefinitionDTO.getOutVariables()) {
+            VariableDTO variableDTO = formVariables.get(taskDefinitionVariable.getName());
+            if (variableDTO != null) {
+                try {
+                    Object object = objectMapper.readValue(variableDTO.getValue().toString(), Class.forName(taskDefinitionVariable.getType()));
+                    outObjectMap.put(taskDefinitionVariable.getName(), object);
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException("Cannot read task variable " + taskDefinitionVariable.getName() + "(" + variableDTO.getType() + "): " + variableDTO.getValue(), e);
+                }
+            } else {
+                outObjectMap.put(taskDefinitionVariable.getName(), null);
+            }
+        }
+        return outObjectMap;
     }
 
     @Override
