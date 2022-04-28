@@ -4,7 +4,7 @@ import ch.gisel.bpmn.create_address.type.AddressType;
 import lombok.Data;
 
 @Data
-public class AddressDTO {
+public class AddressDTO extends BaseDTO {
 
     private Long id;
     private String name;

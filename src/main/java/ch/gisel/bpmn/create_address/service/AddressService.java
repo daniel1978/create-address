@@ -16,4 +16,8 @@ public interface AddressService {
 
     @POST
     AddressDTO saveAddress(AddressDTO address);
+
+    @POST
+    @Path("validate")
+    AddressDTO validateAddress(AddressDTO address);
 }
