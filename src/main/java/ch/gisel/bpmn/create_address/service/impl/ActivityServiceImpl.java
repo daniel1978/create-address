@@ -75,7 +75,7 @@ public class ActivityServiceImpl implements ActivityService {
                 inDTO = new StartInstanceInDTO();
                 inDTO.setVariables(new HashMap<>());
                 for (ActivityProperty property : propertyList) {
-                    inDTO.getVariables().put(property.getName(), createVariableDTO(property.getValue(), property.getType()));
+                    inDTO.getVariables().put(property.getName(), new VariableDTO(property.getValue(), property.getType()));
                 }
             }
 
@@ -102,21 +102,6 @@ public class ActivityServiceImpl implements ActivityService {
         activityWorkContextDTO.setOutObjects(createOutObjects(firstTask.getId(), taskDefinitionDTO));
         activityWorkContextDTO.setInObjects(createInObjects(taskDefinitionDTO));
         return activityWorkContextDTO;
-    }
-
-    private VariableDTO createVariableDTO(String value, String type) {
-        Object valueObject;
-        switch (type) {
-            case "long":
-                valueObject = Long.valueOf(value);
-                break;
-            case "Boolean":
-                valueObject = Boolean.valueOf(value);
-                break;
-            default:
-                valueObject = value;
-        }
-        return new VariableDTO(valueObject, type);
     }
 
     private TaskDefinitionDTO getTaskDefinition(TaskOutDTO task) {
@@ -184,7 +169,6 @@ public class ActivityServiceImpl implements ActivityService {
         validateInObjects(expectedInObjects, inDTO.getInObjects());
 
         SubmitFormInDTO submitFormInDTO = createSubmitFormInDTO(inDTO.getInObjects());
-        //TODO service call does not work yet
         taskService.submitForm(inDTO.getTaskId(), submitFormInDTO);
 
         return workActivity(activityId);
@@ -217,15 +201,26 @@ public class ActivityServiceImpl implements ActivityService {
         for (Map.Entry<String, ActivityVariableDTO> entry : inObjects.entrySet()) {
             try {
                 String jsonValue = objectMapper.writeValueAsString(entry.getValue().getValue());
-                Object object = objectMapper.readValue(jsonValue, Class.forName(entry.getValue().getType()));
-                variableMap.put(entry.getKey(), new VariableDTO(object, entry.getValue().getType()));
-            } catch (ClassNotFoundException | IOException e) {
+                //Object object = objectMapper.readValue(jsonValue, Class.forName(entry.getValue().getType()));
+                variableMap.put(entry.getKey(), new VariableDTO(jsonValue, getVariableType(entry.getValue().getType())));
+            } catch (IOException e) {
                 throw new RuntimeException("Cannot read variable: " + entry.getKey(), e);
             }
         }
         SubmitFormInDTO inDTO = new SubmitFormInDTO();
         inDTO.setVariables(variableMap);
         return inDTO;
+    }
+
+    private String getVariableType(String javaType) {
+        switch (javaType) {
+            case "java.lang.Long":
+                return "long";
+            case "java.lang.Boolean":
+                return "Boolean";
+            default:
+                return "String";
+        }
     }
 
     @Override

@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VariableDTO {
 
-    private Object value;
+    private String value;
     private String type;
 }

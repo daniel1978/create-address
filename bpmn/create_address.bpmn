@@ -36,13 +36,28 @@
     </startEvent>
     <sequenceFlow id="Flow_07d8va7" sourceRef="Activity_review_address" targetRef="Activity_write_address" />
     <sequenceFlow id="Flow_00j862m" sourceRef="Activity_review_address" targetRef="Activity_save_address">
-      <conditionExpression xsi:type="tFormalExpression">${addressValidated}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${addressReviewed}</conditionExpression>
     </sequenceFlow>
     <userTask id="Activity_save_address" name="save address">
       <incoming>Flow_00j862m</incoming>
       <outgoing>Flow_18y7il4</outgoing>
     </userTask>
     <userTask id="Activity_review_address" name="review address" default="Flow_07d8va7">
+      <documentation>{
+  "screenId": "address-review",
+  "outVariables": [
+    {
+      "name": "address",
+      "type": "ch.gisel.bpmn.create_address.dto.AddressDTO"
+    }
+  ],
+  "inVariables": [
+    {
+      "name": "addressReviewed",
+      "type": "java.lang.Boolean"
+    }
+  ]
+}</documentation>
       <extensionElements />
       <incoming>Flow_1q8ouw8</incoming>
       <outgoing>Flow_07d8va7</outgoing>
