@@ -148,7 +148,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/engine-rest/task?processInstanceId=fba231d0-c5a1-11ec-a4b4-0242ac110002",
+									"raw": "http://localhost:8080/engine-rest/task?processInstanceId=778a756a-c726-11ec-afbf-0242ac110002",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -161,7 +161,12 @@
 									"query": [
 										{
 											"key": "processInstanceId",
-											"value": "fba231d0-c5a1-11ec-a4b4-0242ac110002"
+											"value": "778a756a-c726-11ec-afbf-0242ac110002"
+										},
+										{
+											"key": "",
+											"value": "",
+											"disabled": true
 										}
 									]
 								}
@@ -194,6 +199,65 @@
 										"task",
 										"ecbe2643-c4d7-11ec-a4b4-0242ac110002",
 										"complete"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get From Variables",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/engine-rest/task/e67528c7-c733-11ec-afbf-0242ac110002/form-variables?variableNames=address,xyz",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"engine-rest",
+										"task",
+										"e67528c7-c733-11ec-afbf-0242ac110002",
+										"form-variables"
+									],
+									"query": [
+										{
+											"key": "variableNames",
+											"value": "address,xyz"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Submit Form",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"variables\": {\n        \"address\": {\n            \"value\": \"{\\\"validationResult\\\":{\\\"validationMessages\\\":[],\\\"validationStatus\\\":\\\"OK\\\"},\\\"id\\\":2,\\\"name\\\":\\\"Daniel Gisel\\\",\\\"street\\\":\\\"Teststrasse 18\\\",\\\"addressType\\\":\\\"CUSTOMER\\\"}\"\n        },\n        \"abc\": {\n            \"value\": \"test\"\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/engine-rest/task/8abc1a14-c735-11ec-afbf-0242ac110002/submit-form",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"engine-rest",
+										"task",
+										"8abc1a14-c735-11ec-afbf-0242ac110002",
+										"submit-form"
 									]
 								}
 							},
@@ -237,7 +301,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"id\": null,\n    \"name\": \"Angela\",\n    \"street\": \"Anderestrasse\",\n    \"addressType\": \"CUSTOMER\"\n}",
+									"raw": "{\n    \"id\": null,\n    \"name\": \"Daniel\",\n    \"street\": \"Teststrasse\",\n    \"addressType\": \"CUSTOMER\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -271,7 +335,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"activityProperties\": [\n        {\n            \"name\": \"addressId\",\n            \"value\": \"0\",\n            \"type\": \"long\"\n        }\n    ]\n}",
+									"raw": "{\n    \"activityProperties\": [\n        {\n            \"name\": \"addressId\",\n            \"value\": \"2\",\n            \"type\": \"long\"\n        }\n    ]\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -306,7 +370,7 @@
 								"method": "PUT",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8090/services/activity/12/work",
+									"raw": "http://localhost:8090/services/activity/17/work",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -315,8 +379,39 @@
 									"path": [
 										"services",
 										"activity",
-										"12",
+										"17",
 										"work"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Finish Activity Task",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"taskId\": \"af0bf3b8-c7ca-11ec-afbf-0242ac110002\",\n    \"inObjects\": {\n        \"address\": {\n            \"value\": {\n                \"validationResult\": {\n                    \"validationMessages\": [],\n                    \"validationStatus\": \"OK\"\n                },\n                \"id\": 2,\n                \"name\": \"Daniel Gisel\",\n                \"street\": \"Teststrasse 321\",\n                \"addressType\": \"CUSTOMER\"\n            },\n            \"type\": \"ch.gisel.bpmn.create_address.dto.AddressDTO\"\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8090/services/activity/17/task-finish",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8090",
+									"path": [
+										"services",
+										"activity",
+										"17",
+										"task-finish"
 									]
 								}
 							},
