@@ -322,6 +322,36 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Validate Address",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": null,\n    \"name\": \"\",\n    \"street\": \"Teststrasse\",\n    \"addressType\": \"CUSTOMER\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8090/services/address/validate",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8090",
+									"path": [
+										"services",
+										"address",
+										"validate"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -335,7 +365,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"activityProperties\": [\n        {\n            \"name\": \"addressId\",\n            \"value\": \"2\",\n            \"type\": \"long\"\n        }\n    ]\n}",
+									"raw": "{\n    \"activityProperties\": [\n        {\n            \"name\": \"addressId\",\n            \"value\": \"0\",\n            \"type\": \"long\"\n        }\n    ]\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -370,7 +400,7 @@
 								"method": "PUT",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8090/services/activity/17/work",
+									"raw": "http://localhost:8090/services/activity/31/work",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -379,7 +409,7 @@
 									"path": [
 										"services",
 										"activity",
-										"17",
+										"31",
 										"work"
 									]
 								}
@@ -387,13 +417,13 @@
 							"response": []
 						},
 						{
-							"name": "Finish Activity Task",
+							"name": "Finish Task (write address)",
 							"request": {
 								"method": "PUT",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"taskId\": \"af0bf3b8-c7ca-11ec-afbf-0242ac110002\",\n    \"inObjects\": {\n        \"address\": {\n            \"value\": {\n                \"validationResult\": {\n                    \"validationMessages\": [],\n                    \"validationStatus\": \"OK\"\n                },\n                \"id\": 2,\n                \"name\": \"Daniel Gisel\",\n                \"street\": \"Teststrasse 321\",\n                \"addressType\": \"CUSTOMER\"\n            },\n            \"type\": \"ch.gisel.bpmn.create_address.dto.AddressDTO\"\n        }\n    }\n}",
+									"raw": "{\n    \"taskId\": \"364876b9-c7fb-11ec-afbf-0242ac110002\",\n    \"inObjects\": {\n        \"address\": {\n            \"value\": {\n                \"validationResult\": {\n                    \"validationMessages\": [],\n                    \"validationStatus\": \"OK\"\n                },\n                \"id\": null,\n                \"name\": \"Heinz Meier\",\n                \"street\": \"Strasse 7\",\n                \"addressType\": \"MEMBER\"\n            },\n            \"type\": \"ch.gisel.bpmn.create_address.dto.AddressDTO\"\n        }\n    }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -401,7 +431,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8090/services/activity/17/task-finish",
+									"raw": "http://localhost:8090/services/activity/31/task-finish",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -410,7 +440,38 @@
 									"path": [
 										"services",
 										"activity",
-										"17",
+										"31",
+										"task-finish"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Finish Task (review address)",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"taskId\": \"3fc0eecf-c7fb-11ec-afbf-0242ac110002\",\n    \"inObjects\": {\n        \"addressReviewed\": {\n            \"value\": true,\n            \"type\": \"java.lang.Boolean\"\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8090/services/activity/31/task-finish",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8090",
+									"path": [
+										"services",
+										"activity",
+										"31",
 										"task-finish"
 									]
 								}
