@@ -7,5 +7,5 @@ import java.util.Map;
 @Data
 public abstract class VariablesBaseDTO {
 
-    private Map<String, VariableDTO> variables;
+    private Map<String, Object> variables;
 }

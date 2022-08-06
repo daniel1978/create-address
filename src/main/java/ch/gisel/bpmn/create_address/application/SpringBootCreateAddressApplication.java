@@ -2,6 +2,8 @@ package ch.gisel.bpmn.create_address.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import io.camunda.zeebe.spring.client.EnableZeebeClient;
+import io.camunda.zeebe.spring.client.annotation.ZeebeDeployment;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -16,6 +18,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan(basePackages = "ch.gisel.bpmn.create_address.entity")
 @EnableJpaRepositories(basePackages = "ch.gisel.bpmn.create_address.repository")
 @ImportResource("classpath:beans.xml")
+@EnableZeebeClient
+@ZeebeDeployment(resources = "classpath:bpmn/create_address_8.bpmn")
 public class SpringBootCreateAddressApplication {
 
     public static void main(String[] args) {
