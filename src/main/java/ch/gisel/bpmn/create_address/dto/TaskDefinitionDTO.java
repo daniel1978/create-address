@@ -10,5 +10,6 @@ public class TaskDefinitionDTO {
     private String screenId;
     private List<TaskDefinitionVariableDTO> outVariables;
     private List<TaskDefinitionVariableDTO> inVariables;
+    private NavigationDTO navigation;
 
 }

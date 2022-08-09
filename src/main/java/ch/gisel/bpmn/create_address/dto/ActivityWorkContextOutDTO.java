@@ -12,6 +12,7 @@ public class ActivityWorkContextOutDTO {
     private String screenId;
     private Map<String, ActivityVariableDTO> outObjects;
     private Map<String, ActivityVariableDTO> inObjects;
+    private NavigationDTO navigation;
 
     //only for debugging purpose -> remove later
     @Deprecated

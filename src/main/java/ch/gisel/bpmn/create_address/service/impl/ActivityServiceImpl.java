@@ -4,6 +4,8 @@ import ch.gisel.bpmn.create_address.camunda.dto.*;
 import ch.gisel.bpmn.create_address.camunda.service.ProcessDefinitionService;
 import ch.gisel.bpmn.create_address.camunda.service.TaskService;
 import ch.gisel.bpmn.create_address.dto.*;
+import ch.gisel.bpmn.create_address.dto.bpmn.Definitions;
+import ch.gisel.bpmn.create_address.dto.bpmn.SequenceFlow;
 import ch.gisel.bpmn.create_address.entity.Activity;
 import ch.gisel.bpmn.create_address.entity.ActivityProperty;
 import ch.gisel.bpmn.create_address.mapper.ActivityMapper;
@@ -17,7 +19,11 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,16 +107,54 @@ public class ActivityServiceImpl implements ActivityService {
         activityWorkContextDTO.setScreenId(taskDefinitionDTO.getScreenId());
         activityWorkContextDTO.setOutObjects(createOutObjects(firstTask.getId(), taskDefinitionDTO));
         activityWorkContextDTO.setInObjects(createInObjects(taskDefinitionDTO));
+        activityWorkContextDTO.setNavigation(taskDefinitionDTO.getNavigation());
         return activityWorkContextDTO;
     }
 
     private TaskDefinitionDTO getTaskDefinition(TaskOutDTO task) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.readValue(task.getDescription(), TaskDefinitionDTO.class);
+            TaskDefinitionDTO taskDefinition = objectMapper.readValue(task.getDescription(), TaskDefinitionDTO.class);
+            taskDefinition.setNavigation(getTaskNavigation(task));
+            return taskDefinition;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private NavigationDTO getTaskNavigation(TaskOutDTO task) {
+        Bpmn2OutDTO bpmn2OutDTO = processDefinitionService.getBpmn20Xml(task.getProcessDefinitionId());
+
+        Definitions definitions;
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(Definitions.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            definitions = (Definitions) jaxbUnmarshaller.unmarshal(new StringReader(bpmn2OutDTO.getBpmn20Xml()));
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+        List<SequenceFlow> sequenceFlows = definitions.getProcess().getSequenceFlows().stream().filter(f -> f.getSourceRef().equals(task.getTaskDefinitionKey())).collect(Collectors.toList());
+        NavigationDTO navigation = new NavigationDTO();
+        for (SequenceFlow sequenceFlow : sequenceFlows) {
+            if (sequenceFlow.getName() == null) {
+                continue;
+            }
+            switch (sequenceFlow.getName()) {
+                case "Back":
+                    navigation.setBack(true);
+                    break;
+                case "Next":
+                    navigation.setNext(true);
+                    break;
+                case "Cancel":
+                    navigation.setCancel(true);
+                    break;
+                case "Finish":
+                    navigation.setFinish(true);
+                    break;
+            }
+        }
+        return navigation;
     }
 
     private Map<String, ActivityVariableDTO> createOutObjects(String taskId, TaskDefinitionDTO taskDefinitionDTO) {

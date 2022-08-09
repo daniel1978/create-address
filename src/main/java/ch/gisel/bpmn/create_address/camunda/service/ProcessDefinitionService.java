@@ -1,5 +1,6 @@
 package ch.gisel.bpmn.create_address.camunda.service;
 
+import ch.gisel.bpmn.create_address.camunda.dto.Bpmn2OutDTO;
 import ch.gisel.bpmn.create_address.camunda.dto.StartInstanceInDTO;
 import ch.gisel.bpmn.create_address.camunda.dto.StartInstanceOutDTO;
 
@@ -14,4 +15,8 @@ public interface ProcessDefinitionService {
     @POST
     @Path("key/{key}/start")
     StartInstanceOutDTO startInstance(@PathParam("key") String key, StartInstanceInDTO inDTO);
+
+    @GET
+    @Path("{id}/xml")
+    Bpmn2OutDTO getBpmn20Xml(@PathParam("id") String processDefinitionId);
 }

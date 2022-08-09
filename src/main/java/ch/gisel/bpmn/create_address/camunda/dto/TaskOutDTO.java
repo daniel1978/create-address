@@ -10,4 +10,7 @@ public class TaskOutDTO {
     private String id;
     private String name;
     private String description;
+
+    private String processDefinitionId;
+    private String taskDefinitionKey;
 }
