@@ -8,5 +8,6 @@ import java.util.Map;
 public class ActivityWorkContextInDTO {
 
     private String taskId;
+    private String navigation;
     private Map<String, ActivityVariableDTO> inObjects;
 }

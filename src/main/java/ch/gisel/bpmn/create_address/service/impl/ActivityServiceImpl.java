@@ -15,6 +15,7 @@ import ch.gisel.bpmn.create_address.repository.ActivityRepository;
 import ch.gisel.bpmn.create_address.service.ActivityService;
 import ch.gisel.bpmn.create_address.type.ActivityStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -209,13 +210,42 @@ public class ActivityServiceImpl implements ActivityService {
         }
 
         TaskDefinitionDTO taskDefinitionDTO = getTaskDefinition(firstTask);
+        validateNavigation(inDTO.getNavigation(), taskDefinitionDTO);
         Map<String, ActivityVariableDTO> expectedInObjects = createInObjects(taskDefinitionDTO);
         validateInObjects(expectedInObjects, inDTO.getInObjects());
 
-        SubmitFormInDTO submitFormInDTO = createSubmitFormInDTO(inDTO.getInObjects());
+        SubmitFormInDTO submitFormInDTO = createSubmitFormInDTO(inDTO.getNavigation(), inDTO.getInObjects());
         taskService.submitForm(inDTO.getTaskId(), submitFormInDTO);
 
         return workActivity(activityId);
+    }
+
+    private void validateNavigation(String navigation, TaskDefinitionDTO task) {
+        if (StringUtils.isBlank(navigation)) {
+            throw new RuntimeException("No navigation provided");
+        }
+        switch (navigation.toLowerCase()) {
+            case "back":
+                if (!task.getNavigation().isBack()) {
+                    throw new RuntimeException("Navigation BACK is not allowed");
+                }
+                break;
+            case "next":
+                if (!task.getNavigation().isNext()) {
+                    throw new RuntimeException("Navigation NEXT is not allowed");
+                }
+                break;
+            case "cancel":
+                if (!task.getNavigation().isCancel()) {
+                    throw new RuntimeException("Navigation CANCEL is not allowed");
+                }
+                break;
+            case "finish":
+                if (!task.getNavigation().isFinish()) {
+                    throw new RuntimeException("Navigation FINISH is not allowed");
+                }
+                break;
+        }
     }
 
     private void validateInObjects(Map<String, ActivityVariableDTO> expectedInObjects, Map<String, ActivityVariableDTO> inObjects) {
@@ -235,20 +265,21 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    private SubmitFormInDTO createSubmitFormInDTO(Map<String, ActivityVariableDTO> inObjects) {
-        if (inObjects == null || inObjects.size() == 0) {
-            return null;
-        }
-        Map<String, VariableDTO> variableMap = new HashMap<>();
+    private SubmitFormInDTO createSubmitFormInDTO(String navigation, Map<String, ActivityVariableDTO> inObjects) {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        for (Map.Entry<String, ActivityVariableDTO> entry : inObjects.entrySet()) {
-            try {
-                String jsonValue = objectMapper.writeValueAsString(entry.getValue().getValue());
-                //Object object = objectMapper.readValue(jsonValue, Class.forName(entry.getValue().getType()));
-                variableMap.put(entry.getKey(), new VariableDTO(jsonValue, getVariableType(entry.getValue().getType())));
-            } catch (IOException e) {
-                throw new RuntimeException("Cannot read variable: " + entry.getKey(), e);
+        Map<String, VariableDTO> variableMap = new HashMap<>();
+        variableMap.put("navigation", new VariableDTO(navigation.toLowerCase(), "String"));
+
+        if (inObjects != null && inObjects.size() > 0) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            for (Map.Entry<String, ActivityVariableDTO> entry : inObjects.entrySet()) {
+                try {
+                    String jsonValue = objectMapper.writeValueAsString(entry.getValue().getValue());
+                    //Object object = objectMapper.readValue(jsonValue, Class.forName(entry.getValue().getType()));
+                    variableMap.put(entry.getKey(), new VariableDTO(jsonValue, getVariableType(entry.getValue().getType())));
+                } catch (IOException e) {
+                    throw new RuntimeException("Cannot read variable: " + entry.getKey(), e);
+                }
             }
         }
         SubmitFormInDTO inDTO = new SubmitFormInDTO();

@@ -37,7 +37,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/engine-rest/process-definition/invoice:2:aec2cc05-c48c-11ec-bf88-0242ac110002/xml",
+									"raw": "http://localhost:8080/engine-rest/process-definition/CreateAddress:1:24761916-17cc-11ed-b0eb-0242ac110002/xml",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -46,7 +46,7 @@
 									"path": [
 										"engine-rest",
 										"process-definition",
-										"invoice:2:aec2cc05-c48c-11ec-bf88-0242ac110002",
+										"CreateAddress:1:24761916-17cc-11ed-b0eb-0242ac110002",
 										"xml"
 									]
 								}
@@ -148,7 +148,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8080/engine-rest/task?processInstanceId=778a756a-c726-11ec-afbf-0242ac110002",
+									"raw": "http://localhost:8080/engine-rest/task?processInstanceId=6a259b2b-17cc-11ed-b0eb-0242ac110002",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -161,7 +161,7 @@
 									"query": [
 										{
 											"key": "processInstanceId",
-											"value": "778a756a-c726-11ec-afbf-0242ac110002"
+											"value": "6a259b2b-17cc-11ed-b0eb-0242ac110002"
 										},
 										{
 											"key": "",
@@ -400,7 +400,7 @@
 								"method": "PUT",
 								"header": [],
 								"url": {
-									"raw": "http://localhost:8090/services/activity/31/work",
+									"raw": "http://localhost:8090/services/activity/11/work",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -409,7 +409,7 @@
 									"path": [
 										"services",
 										"activity",
-										"31",
+										"11",
 										"work"
 									]
 								}
@@ -423,7 +423,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"taskId\": \"364876b9-c7fb-11ec-afbf-0242ac110002\",\n    \"inObjects\": {\n        \"address\": {\n            \"value\": {\n                \"validationResult\": {\n                    \"validationMessages\": [],\n                    \"validationStatus\": \"OK\"\n                },\n                \"id\": null,\n                \"name\": \"Heinz Meier\",\n                \"street\": \"Strasse 7\",\n                \"addressType\": \"MEMBER\"\n            },\n            \"type\": \"ch.gisel.bpmn.create_address.dto.AddressDTO\"\n        }\n    }\n}",
+									"raw": "{\n    \"taskId\": \"a2e352b7-186a-11ed-b0eb-0242ac110002\",\n    \"navigation\": \"next\",\n    \"inObjects\": {\n        \"address\": {\n            \"value\": {\n                \"validationResult\": {\n                    \"validationMessages\": [],\n                    \"validationStatus\": \"OK\"\n                },\n                \"id\": null,\n                \"name\": \"Peter Muster\",\n                \"street\": \"Teststrasse 6\",\n                \"addressType\": \"MEMBER\"\n            },\n            \"type\": \"ch.gisel.bpmn.create_address.dto.AddressDTO\"\n        }\n    }\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -431,7 +431,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8090/services/activity/31/task-finish",
+									"raw": "http://localhost:8090/services/activity/11/task-finish",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -440,7 +440,7 @@
 									"path": [
 										"services",
 										"activity",
-										"31",
+										"11",
 										"task-finish"
 									]
 								}
@@ -454,7 +454,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"taskId\": \"3fc0eecf-c7fb-11ec-afbf-0242ac110002\",\n    \"inObjects\": {\n        \"addressReviewed\": {\n            \"value\": true,\n            \"type\": \"java.lang.Boolean\"\n        }\n    }\n}",
+									"raw": "{\n    \"taskId\": \"b66ed52f-186a-11ed-b0eb-0242ac110002\",\n    \"navigation\": \"next\",\n    \"inObjects\": null\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -462,7 +462,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8090/services/activity/31/task-finish",
+									"raw": "http://localhost:8090/services/activity/11/task-finish",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -471,7 +471,7 @@
 									"path": [
 										"services",
 										"activity",
-										"31",
+										"11",
 										"task-finish"
 									]
 								}

@@ -31,10 +31,9 @@
         </camunda:connector>
       </extensionElements>
       <incoming>Flow_16kht7u</incoming>
-      <incoming>Flow_0j65s08</incoming>
       <outgoing>Flow_1xpzjpj</outgoing>
     </serviceTask>
-    <userTask id="Activity_write_address" name="write address" default="Flow_1q8ouw8">
+    <userTask id="Activity_write_address" name="write address">
       <documentation>{
   "screenId": "address-edit",
   "outVariables": [
@@ -55,7 +54,6 @@
       <incoming>Flow_1xpzjpj</incoming>
       <incoming>Flow_1yg7vy5</incoming>
       <outgoing>Flow_1q8ouw8</outgoing>
-      <outgoing>Flow_0j65s08</outgoing>
     </userTask>
     <serviceTask id="Activity_validate_address" name="validate address" default="Flow_0fsivrc">
       <extensionElements>
@@ -88,10 +86,6 @@
     }
   ],
   "inVariables": [
-    {
-      "name": "addressReviewed",
-      "type": "java.lang.Boolean"
-    }
   ]
 }</documentation>
       <extensionElements />
@@ -168,9 +162,9 @@ obj.validationResult.validationStatus == 'ERROR'</conditionExpression>
     <sequenceFlow id="Flow_0fsivrc" sourceRef="Activity_validate_address" targetRef="Activity_review_address" />
     <sequenceFlow id="Flow_1xpzjpj" sourceRef="Activity_18aordx" targetRef="Activity_write_address" />
     <sequenceFlow id="Flow_00j862m" name="Next" sourceRef="Activity_review_address" targetRef="Activity_save_address">
-      <conditionExpression xsi:type="tFormalExpression">${addressReviewed}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression" language="JavaScript">navigation == 'next'</conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="Flow_07d8va7" sourceRef="Activity_review_address" targetRef="Activity_write_address" />
+    <sequenceFlow id="Flow_07d8va7" name="Back" sourceRef="Activity_review_address" targetRef="Activity_write_address" />
     <sequenceFlow id="Flow_0ovpnem" name="nicht Mitglied" sourceRef="Gateway_1lu4op0" targetRef="Activity_1kh4eq1">
       <conditionExpression xsi:type="tFormalExpression" language="JavaScript">const obj = JSON.parse(address);
 obj.addressType != 'MEMBER'</conditionExpression>
@@ -184,9 +178,6 @@ obj.addressType == 'MEMBER'</conditionExpression>
     <sequenceFlow id="Flow_16kht7u" sourceRef="StartEvent_1" targetRef="Activity_18aordx" />
     <sequenceFlow id="Flow_0d0vvkh" sourceRef="Activity_17u5m7o" targetRef="Activity_1kh4eq1" />
     <sequenceFlow id="Flow_1qzguuu" name="Finish" sourceRef="Activity_1kh4eq1" targetRef="Event_1hmjx60" />
-    <sequenceFlow id="Flow_0j65s08" name="Back" sourceRef="Activity_write_address" targetRef="Activity_18aordx">
-      <conditionExpression xsi:type="tFormalExpression" language="JavaScript">false</conditionExpression>
-    </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0nq2gro">
@@ -241,6 +232,9 @@ obj.addressType == 'MEMBER'</conditionExpression>
         <di:waypoint x="670" y="170" />
         <di:waypoint x="420" y="170" />
         <di:waypoint x="420" y="217" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="533" y="152" width="25" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_00j862m_di" bpmnElement="Flow_00j862m">
         <di:waypoint x="720" y="257" />
@@ -262,15 +256,6 @@ obj.addressType == 'MEMBER'</conditionExpression>
         <di:waypoint x="540" y="330" />
         <di:waypoint x="420" y="330" />
         <di:waypoint x="420" y="297" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0j65s08_di" bpmnElement="Flow_0j65s08">
-        <di:waypoint x="390" y="297" />
-        <di:waypoint x="390" y="350" />
-        <di:waypoint x="300" y="350" />
-        <di:waypoint x="300" y="297" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="333" y="332" width="25" height="14" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Gateway_1lu4op0_di" bpmnElement="Gateway_1lu4op0" isMarkerVisible="true">
         <dc:Bounds x="885" y="232" width="50" height="50" />
